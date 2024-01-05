@@ -1,29 +1,40 @@
-﻿using System;
+﻿using EscapeFromTheWoods.MongoDB.Repo;
+using EscapeFromTheWoods.Objects;
+using MongoDB.Driver;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EscapeFromTheWoods
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             Console.WriteLine("Hello World!");
-            string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Refactoring_DB;Integrated Security=True";
-            DBwriter db = new DBwriter(connectionString);
 
-            string path = @"C:\NET\monkeys";
+            string connectionStringMongoDB = "mongodb://localhost:27017";
+
+            MongoDBRepository mongoDBRepository = new MongoDBRepository(connectionStringMongoDB);
+
+            string path = @"D:\Hogent\Semester_3\PS\Opdrachten\Opdracht 3 - Refactoring\EscapeFromTheWoodsToRefactor\monkeys";
             Map m1 = new Map(0, 500, 0, 500);
-            Wood w1 = WoodBuilder.GetWood(500, m1, path,db);
+            //Map m1 = new Map(0, 10, 0, 10);
+            Wood w1 = WoodBuilder.GetWood(500, m1, path, mongoDBRepository);
+            //Wood w1 = WoodBuilder.GetWood(10, m1, path, mongoDBRepository);
+
             w1.PlaceMonkey("Alice", IDgenerator.GetMonkeyID());
             w1.PlaceMonkey("Janice", IDgenerator.GetMonkeyID());
             w1.PlaceMonkey("Toby", IDgenerator.GetMonkeyID());
             w1.PlaceMonkey("Mindy", IDgenerator.GetMonkeyID());
             w1.PlaceMonkey("Jos", IDgenerator.GetMonkeyID());
-            
+
             Map m2 = new Map(0, 200, 0, 400);
-            Wood w2 = WoodBuilder.GetWood(2500, m2, path,db);
+            Wood w2 = WoodBuilder.GetWood(2500, m2, path, mongoDBRepository);
             w2.PlaceMonkey("Tom", IDgenerator.GetMonkeyID());
             w2.PlaceMonkey("Jerry", IDgenerator.GetMonkeyID());
             w2.PlaceMonkey("Tiffany", IDgenerator.GetMonkeyID());
@@ -31,21 +42,61 @@ namespace EscapeFromTheWoods
             w2.PlaceMonkey("Jebus", IDgenerator.GetMonkeyID());
 
             Map m3 = new Map(0, 400, 0, 400);
-            Wood w3 = WoodBuilder.GetWood(2000, m3, path,db);
+            Wood w3 = WoodBuilder.GetWood(2000, m3, path, mongoDBRepository);
             w3.PlaceMonkey("Kelly", IDgenerator.GetMonkeyID());
             w3.PlaceMonkey("Kenji", IDgenerator.GetMonkeyID());
             w3.PlaceMonkey("Kobe", IDgenerator.GetMonkeyID());
             w3.PlaceMonkey("Kendra", IDgenerator.GetMonkeyID());
 
-            w1.WriteWoodToDB();
-            w2.WriteWoodToDB();
-            w3.WriteWoodToDB();
-            w1.Escape();
-            w2.Escape();
-            w3.Escape();
-            
+            //var writeWoodTasks = new List<Task> { w1.WriteWoodToDBAsync(), w2.WriteWoodToDBAsync(), w3.WriteWoodToDBAsync() };
+            //var escapeTasks = new List<Task> { w1.EscapeAsync(m1), w2.EscapeAsync(m2), w3.EscapeAsync(m3) };
+
+            //var writeWoodTask = Task.Run(() => w1.WriteWoodToDBAsync());
+            //var escapeTask = Task.Run(() => w1.EscapeAsync(m1));
+
+            //await Task.WhenAll(writeWoodTasks);
+            //await Task.WhenAll(escapeTasks);
+
+            //await Task.Run(async () =>
+            //{
+            //    await w1.WriteWoodToDBAsync();
+            //    await w1.EscapeAsync(m1);
+            //});
+
+            //var writeWoodTask = Task.Run(() => w1.WriteWoodToDBAsync());
+            //var escapeTask = Task.Run(() => w1.EscapeAsync(m1));
+
+            //await Task.WhenAll(writeWoodTask, escapeTask);
+
+            //await Task.WhenAll(
+            //    Task.Run(async () =>
+            //    {
+            //        await w1.WriteWoodToDBAsync();
+            //        await w1.EscapeAsync(m1);
+            //    }),
+            //    Task.Run(async () =>
+            //    {
+            //        await w2.WriteWoodToDBAsync();
+            //        await w2.EscapeAsync(m2);
+            //    }),
+            //    Task.Run(async () =>
+            //    {
+            //        await w3.WriteWoodToDBAsync();
+            //        await w3.EscapeAsync(m3);
+            //    })
+            //);
+
+            await w1.WriteWoodToDBAsync();
+            await w1.EscapeAsync(m1);
+
+            await w2.WriteWoodToDBAsync();
+            await w2.EscapeAsync(m2);
+
+            await w3.WriteWoodToDBAsync();
+            await w3.EscapeAsync(m3);
+
             stopwatch.Stop();
-            // Write result.
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
             Console.WriteLine("end");
         }
