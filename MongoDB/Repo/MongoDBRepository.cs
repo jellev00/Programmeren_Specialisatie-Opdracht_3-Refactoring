@@ -14,12 +14,6 @@ namespace EscapeFromTheWoods.MongoDB.Repo
         private IMongoClient _client;
         private string _connectionString;
 
-        //public MongoDBRepository(string connectionString, string databaseName)
-        //{
-        //    var client = new MongoClient(connectionString);
-        //    _database = client.GetDatabase(databaseName);
-        //}
-
         public MongoDBRepository(string connectionString)
         {
             _connectionString = connectionString;

@@ -23,10 +23,7 @@ namespace EscapeFromTheWoods
 
             string path = @"D:\Hogent\Semester_3\PS\Opdrachten\Opdracht 3 - Refactoring\EscapeFromTheWoodsToRefactor\monkeys";
             Map m1 = new Map(0, 500, 0, 500);
-            //Map m1 = new Map(0, 10, 0, 10);
             Wood w1 = WoodBuilder.GetWood(500, m1, path, mongoDBRepository);
-            //Wood w1 = WoodBuilder.GetWood(10, m1, path, mongoDBRepository);
-
             w1.PlaceMonkey("Alice", IDgenerator.GetMonkeyID());
             w1.PlaceMonkey("Janice", IDgenerator.GetMonkeyID());
             w1.PlaceMonkey("Toby", IDgenerator.GetMonkeyID());
@@ -48,52 +45,32 @@ namespace EscapeFromTheWoods
             w3.PlaceMonkey("Kobe", IDgenerator.GetMonkeyID());
             w3.PlaceMonkey("Kendra", IDgenerator.GetMonkeyID());
 
-            //var writeWoodTasks = new List<Task> { w1.WriteWoodToDBAsync(), w2.WriteWoodToDBAsync(), w3.WriteWoodToDBAsync() };
-            //var escapeTasks = new List<Task> { w1.EscapeAsync(m1), w2.EscapeAsync(m2), w3.EscapeAsync(m3) };
+            await Task.WhenAll(
+                Task.Run(async () =>
+                {
+                    await w1.WriteWoodToDBAsync();
+                    await w1.EscapeAsync(m1);
+                }),
+                Task.Run(async () =>
+                {
+                    await w2.WriteWoodToDBAsync();
+                    await w2.EscapeAsync(m2);
+                }),
+                Task.Run(async () =>
+                {
+                    await w3.WriteWoodToDBAsync();
+                    await w3.EscapeAsync(m3);
+                })
+            );
 
-            //var writeWoodTask = Task.Run(() => w1.WriteWoodToDBAsync());
-            //var escapeTask = Task.Run(() => w1.EscapeAsync(m1));
+            //await w1.WriteWoodToDBAsync();
+            //await w1.EscapeAsync(m1);
 
-            //await Task.WhenAll(writeWoodTasks);
-            //await Task.WhenAll(escapeTasks);
+            //await w2.WriteWoodToDBAsync();
+            //await w2.EscapeAsync(m2);
 
-            //await Task.Run(async () =>
-            //{
-            //    await w1.WriteWoodToDBAsync();
-            //    await w1.EscapeAsync(m1);
-            //});
-
-            //var writeWoodTask = Task.Run(() => w1.WriteWoodToDBAsync());
-            //var escapeTask = Task.Run(() => w1.EscapeAsync(m1));
-
-            //await Task.WhenAll(writeWoodTask, escapeTask);
-
-            //await Task.WhenAll(
-            //    Task.Run(async () =>
-            //    {
-            //        await w1.WriteWoodToDBAsync();
-            //        await w1.EscapeAsync(m1);
-            //    }),
-            //    Task.Run(async () =>
-            //    {
-            //        await w2.WriteWoodToDBAsync();
-            //        await w2.EscapeAsync(m2);
-            //    }),
-            //    Task.Run(async () =>
-            //    {
-            //        await w3.WriteWoodToDBAsync();
-            //        await w3.EscapeAsync(m3);
-            //    })
-            //);
-
-            await w1.WriteWoodToDBAsync();
-            await w1.EscapeAsync(m1);
-
-            await w2.WriteWoodToDBAsync();
-            await w2.EscapeAsync(m2);
-
-            await w3.WriteWoodToDBAsync();
-            await w3.EscapeAsync(m3);
+            //await w3.WriteWoodToDBAsync();
+            //await w3.EscapeAsync(m3);
 
             stopwatch.Stop();
             Console.ForegroundColor = ConsoleColor.Blue;

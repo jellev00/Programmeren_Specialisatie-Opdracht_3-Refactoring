@@ -31,31 +31,12 @@ namespace EscapeFromTheWoods.Objects
             GridData[i][j].Add(tree);
         }
 
-        //public GridDataSet(int delta, MapBoundary mapBoundary)
-        //{
-        //    Delta = delta;
-        //    MapBoundary = mapBoundary;
-        //    NX = (int)(mapBoundary.DeltaX / delta) + 1;
-        //    NY = (int)(mapBoundary.DeltaY / delta) + 1;
-        //    GridData = new List<Tree>[NX][];
-        //    for(int i = 0; i < NX; i++)
-        //    {
-        //        GridData[i] = new List<Tree>[NY];
-        //        for(int j = 0; j < NY; j++)
-        //        {
-        //            GridData[i][j] = new List<Tree>();
-        //        }
-        //    }
-        //}
-
         public GridDataSet(int delta, MapBoundary mapBoundary)
         {
             Delta = delta;
             MapBoundary = mapBoundary;
             NX = (int)(mapBoundary.DeltaX / delta) + 1;
             NY = (int)(mapBoundary.DeltaY / delta) + 1;
-
-            //Console.WriteLine($"NX: {NX}, NY: {NY}");
 
             // Initialize the GridData array
             GridData = new List<Tree>[NX][];
