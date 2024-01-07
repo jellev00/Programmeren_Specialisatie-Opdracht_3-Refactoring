@@ -1,9 +1,7 @@
 ﻿using EscapeFromTheWoods.MongoDB.Repo;
-using EscapeFromTheWoods.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace EscapeFromTheWoods
 {
@@ -12,17 +10,22 @@ namespace EscapeFromTheWoods
         public static Wood GetWood(int size, Map map, string path, MongoDBRepository db)
         {
             Random r = new Random();
+            // bomen opslaan met hun ID
             Dictionary<int, Tree> treeDictionary = new Dictionary<int, Tree>();
+
+            // n: Dit zijn de aantal bomen
             int n = 0;
 
             while (n < size)
             {
+                // nieuwe boom aanmaken op een willekeurige positie binnen de mee gegeven map grenzen
                 Tree t = new Tree(IDgenerator.GetTreeID(), r.Next(map.xmin, map.xmax), r.Next(map.ymin, map.ymax));
 
+                // kijken of de ID al in de dictionary zit. Zo niet voeg hem toe
                 if (!treeDictionary.ContainsKey(t.treeID))
                 {
                     treeDictionary.Add(t.treeID, t);
-                    n++;
+                    n++; // aantal bomen verhogen
                 }
             }
 

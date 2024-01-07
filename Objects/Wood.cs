@@ -7,12 +7,7 @@ using System.Drawing;
 using EscapeFromTheWoods.MongoDB.Repo;
 using EscapeFromTheWoods.MongoDB.Models;
 using EscapeFromTheWoods.Objects;
-using DnsClient.Protocol;
 using System.Threading.Tasks;
-using System.Threading;
-using System.Runtime.CompilerServices;
-using System.Runtime.ExceptionServices;
-using ZstdSharp.Unsafe;
 
 namespace EscapeFromTheWoods
 {
@@ -20,7 +15,6 @@ namespace EscapeFromTheWoods
     {
         private const int drawingFactor = 8;
         private string path;
-        //private DBwriter db;
         private MongoDBRepository db;
         private Random r = new Random(1);
         public int woodID { get; set; }
@@ -48,6 +42,7 @@ namespace EscapeFromTheWoods
 
         public void PlaceMonkey(string monkeyName, int monkeyID)
         {
+            // boom kiezen waar geen aap zit
             int treeNr;
             do
             {
@@ -55,16 +50,20 @@ namespace EscapeFromTheWoods
             }
             while (trees[treeNr].hasMonkey);
 
+            // aap aanmaken en in den boom plaatsen
             Monkey m = new Monkey(monkeyID, monkeyName, trees[treeNr]);
 
             int index = monkeys.BinarySearch(m, new MonkeyNameComparer());
+            // als de naam al bestaat, voeg de aap dan toe op een ander positie
             if (index < 0)
             {
                 index = ~index;
             }
-
+            
+            // aap toevoegen
             monkeys.Insert(index, m);
 
+            // boom om bezet zetten
             trees[treeNr].hasMonkey = true;
         }
 
@@ -72,8 +71,10 @@ namespace EscapeFromTheWoods
         {
             public int Compare(Monkey x, Monkey y)
             {
+                // kijken of de naam gelijk is
                 int nameComparison = string.Compare(x.name, y.name, StringComparison.OrdinalIgnoreCase);
 
+                // kijken als de naam gelijk ze gaan vergelijk op de ID
                 return nameComparison == 0 ? x.monkeyID.CompareTo(y.monkeyID) : nameComparison;
             }
         }
@@ -82,6 +83,7 @@ namespace EscapeFromTheWoods
         {
             List<List<Tree>> routes = new List<List<Tree>>();
 
+            // gaat over alle apen en schrijft hun route naar de lijst
             for (int i = 0; i < monkeys.Count; i++)
             {
                 var route = await EscapeMonkeyAsync(monkeys[i], map);
@@ -97,6 +99,7 @@ namespace EscapeFromTheWoods
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine($"{woodID}:write db routes {woodID},{monkey.name} start");
 
+            // kijken of er nog geen Steps zijn voor een aap
             if (!monkeySteps.ContainsKey(monkey.monkeyID))
             {
                 monkeySteps[monkey.monkeyID] = new List<int>();
@@ -104,6 +107,8 @@ namespace EscapeFromTheWoods
 
             List<MonkeyRecords> records = new List<MonkeyRecords>();
             List<Logs> logs = new List<Logs>();
+
+            // gaat over alle route om deze dat naar de DB te schrijven (mockeyRecods & logs)
             for (int j = 0; j < route.Count; j++)
             {
                 MonkeyRecords monkeyRecords = new MonkeyRecords
@@ -165,8 +170,13 @@ namespace EscapeFromTheWoods
 
                             if (record != null)
                             {
-                                logsMessage.Add($"{monkey.name} is now in tree {record.TreeID} at location ({record.X},{record.Y})");
-                                i++;
+                                string logEntry = $"{monkey.name} is now in tree {record.TreeID} at location ({record.X},{record.Y})";
+
+                                if (!logsMessage.Contains(logEntry))
+                                {
+                                    logsMessage.Add(logEntry);
+                                    i++;
+                                }
                             }
                         }
                     }
@@ -258,6 +268,7 @@ namespace EscapeFromTheWoods
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"{woodID}:start {woodID},{monkey.name}");
 
+            // kijken welk boom al bezogt is
             Dictionary<int, bool> visited = new Dictionary<int, bool>();
             trees.ForEach(x => visited.Add(x.treeID, false));
 
@@ -268,6 +279,7 @@ namespace EscapeFromTheWoods
 
             GridDataSet g2 = new GridDataSet(mB, 10, trees);
 
+            // aantal bomen die een aap wil bezoekn
             int n = 15;
 
             do
